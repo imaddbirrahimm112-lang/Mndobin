@@ -1,1 +1,615 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <title>إضافة الإيرادات - المندوبين</title>
 
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap');
+
+    *{margin:0;padding:0;box-sizing:border-box}
+    html,body{height:100%;width:100%}
+    body{
+      font-family:'Cairo',sans-serif;
+      overflow:hidden;
+      color:#fff;
+      background:#0b1020;
+    }
+
+    body::before{
+      content:'';
+      position:fixed;
+      inset:0;
+      background:linear-gradient(135deg,#0d0221,#1b0f45,#1f2a6b,#0d1b4d,#081229);
+      background-size:400% 400%;
+      animation:bgMove 18s ease infinite;
+      z-index:-2;
+    }
+
+    body::after{
+      content:'';
+      position:fixed;
+      inset:0;
+      background-image:
+        radial-gradient(1.5px 1.5px at 15px 25px,rgba(255,255,255,.8),transparent),
+        radial-gradient(1px 1px at 55px 65px,rgba(190,210,255,.8),transparent),
+        radial-gradient(2px 2px at 120px 45px,rgba(200,180,255,.85),transparent),
+        radial-gradient(1px 1px at 85px 110px,rgba(255,255,255,.65),transparent),
+        radial-gradient(1.5px 1.5px at 200px 85px,rgba(200,180,255,.75),transparent),
+        radial-gradient(1px 1px at 280px 130px,rgba(255,255,255,.85),transparent);
+      background-repeat:repeat;
+      background-size:360px 260px;
+      opacity:.55;
+      z-index:-1;
+      animation:twinkle 7s ease-in-out infinite;
+    }
+
+    @keyframes bgMove{
+      0%{background-position:0% 50%}
+      50%{background-position:100% 50%}
+      100%{background-position:0% 50%}
+    }
+    @keyframes twinkle{
+      0%,100%{opacity:.45}
+      50%{opacity:.9}
+    }
+    @keyframes pulse{
+      0%,100%{opacity:1}
+      50%{opacity:.35}
+    }
+
+    .app{
+      height:100%;
+      display:flex;
+      flex-direction:column;
+    }
+
+    .topbar{
+      flex-shrink:0;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+      padding:14px 18px;
+      background:rgba(255,255,255,.08);
+      backdrop-filter:blur(14px);
+      border-bottom:1px solid rgba(255,255,255,.14);
+    }
+
+    .topbar-left{
+      display:flex;
+      flex-direction:column;
+      gap:4px;
+      min-width:0;
+    }
+
+    .topbar-title{
+      font-size:18px;
+      font-weight:800;
+      white-space:nowrap;
+    }
+
+    .topbar-sub{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap;
+      font-size:12px;
+      opacity:.85;
+    }
+
+    .content{
+      flex:1;
+      overflow-y:auto;
+      padding:18px;
+      background:rgba(255,255,255,.03);
+    }
+    .content::-webkit-scrollbar{width:6px}
+    .content::-webkit-scrollbar-thumb{
+      background:rgba(255,255,255,.25);
+      border-radius:8px;
+    }
+
+    .shell{
+      max-width:900px;
+      margin:0 auto;
+    }
+
+    .card{
+      background:rgba(255,255,255,.12);
+      backdrop-filter:blur(14px);
+      border:1px solid rgba(255,255,255,.18);
+      border-radius:18px;
+      padding:18px;
+      margin-bottom:16px;
+      box-shadow:0 8px 30px rgba(0,0,0,.18);
+    }
+
+    .card h3{
+      font-size:17px;
+      font-weight:800;
+      margin-bottom:14px;
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:14px;
+    }
+
+    .form-group{
+      margin-bottom:14px;
+    }
+
+    .form-group label{
+      display:block;
+      font-size:13px;
+      margin-bottom:6px;
+      font-weight:700;
+      color:#f3f4f6;
+    }
+
+    .input,.select,.textarea{
+      width:100%;
+      padding:12px 13px;
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,.22);
+      background:rgba(255,255,255,.1);
+      color:#fff;
+      font-family:'Cairo',sans-serif;
+      font-size:14px;
+      outline:none;
+    }
+
+    .input:focus,.select:focus,.textarea:focus{
+      border-color:rgba(129,140,248,.9);
+      box-shadow:0 0 0 3px rgba(129,140,248,.16);
+      background:rgba(255,255,255,.14);
+    }
+
+    .textarea{
+      resize:vertical;
+      min-height:90px;
+    }
+
+    .select option{
+      background:#111827;
+      color:#fff;
+    }
+
+    .stats{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:12px;
+    }
+
+    .stat{
+      background:rgba(255,255,255,.08);
+      border:1px solid rgba(255,255,255,.14);
+      border-radius:14px;
+      padding:14px 12px;
+      text-align:center;
+    }
+
+    .stat .label{
+      font-size:12px;
+      opacity:.82;
+      margin-bottom:4px;
+      font-weight:700;
+    }
+
+    .stat .value{
+      font-size:20px;
+      font-weight:800;
+    }
+
+    .actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top:10px;
+    }
+
+    .btn{
+      padding:12px 18px;
+      border:none;
+      border-radius:12px;
+      cursor:pointer;
+      font-family:'Cairo',sans-serif;
+      font-size:14px;
+      font-weight:800;
+      transition:.22s ease;
+    }
+    .btn:hover{transform:translateY(-1px)}
+    .btn-primary{
+      background:rgba(99,102,241,.72);
+      color:#fff;
+      border:1px solid rgba(99,102,241,.95);
+    }
+    .btn-secondary{
+      background:rgba(148,163,184,.25);
+      color:#fff;
+      border:1px solid rgba(255,255,255,.18);
+    }
+
+    .msg-box{
+      position:fixed;
+      top:18px;
+      right:18px;
+      z-index:9999;
+    }
+
+    .msg{
+      padding:12px 16px;
+      border-radius:10px;
+      margin-bottom:8px;
+      font-size:13px;
+      backdrop-filter:blur(10px);
+      animation:fadeSlide .25s ease;
+    }
+
+    .msg.ok{
+      background:rgba(72,187,120,.28);
+      border:1px solid rgba(72,187,120,.6);
+      color:#b9f6ca;
+    }
+
+    .msg.err{
+      background:rgba(245,101,101,.28);
+      border:1px solid rgba(245,101,101,.6);
+      color:#ffc1c1;
+    }
+
+    @keyframes fadeSlide{
+      from{opacity:0;transform:translateY(-8px)}
+      to{opacity:1;transform:translateY(0)}
+    }
+
+    @media (max-width: 780px){
+      .grid{grid-template-columns:1fr}
+      .stats{grid-template-columns:1fr}
+      .content{padding:12px}
+      .topbar{flex-direction:column;align-items:flex-start}
+    }
+  </style>
+</head>
+<body>
+  <div class="msg-box" id="msgBox"></div>
+
+  <div class="app">
+    <div class="topbar">
+      <div class="topbar-left">
+        <div class="topbar-title">➕ برنامج إضافة الإيرادات</div>
+        <div class="topbar-sub">
+          <span>مندوبين + مناطق + سعر صرف + تاريخ</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="content">
+      <div class="shell">
+
+        <div class="card">
+          <h3>⚙️ إعدادات Firebase</h3>
+
+          <div class="grid">
+            <div class="form-group">
+              <label>Firebase API Key</label>
+              <input type="text" id="apiKey" class="input" placeholder="ضع apiKey هنا">
+            </div>
+
+            <div class="form-group">
+              <label>Auth Domain</label>
+              <input type="text" id="authDomain" class="input" placeholder="مثال: your-project.firebaseapp.com">
+            </div>
+
+            <div class="form-group">
+              <label>Project ID</label>
+              <input type="text" id="projectId" class="input" placeholder="ضع projectId هنا">
+            </div>
+
+            <div class="form-group">
+              <label>Collection Name</label>
+              <input type="text" id="collectionName" class="input" placeholder="reports">
+            </div>
+          </div>
+
+          <div class="actions">
+            <button class="btn btn-primary" id="saveConfigBtn">💾 حفظ الإعدادات</button>
+            <button class="btn btn-secondary" id="clearConfigBtn">🗑️ حذف الإعدادات</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>📝 إدخال عملية جديدة</h3>
+
+          <div class="grid">
+            <div class="form-group">
+              <label>اسم المندوب</label>
+              <select id="rep" class="select"></select>
+            </div>
+
+            <div class="form-group">
+              <label>المنطقة</label>
+              <select id="region" class="select"></select>
+            </div>
+
+            <div class="form-group">
+              <label>المبلغ بالليرة السورية (SYP)</label>
+              <input type="number" id="amount" class="input" placeholder="مثال: 150000" step="0.01">
+            </div>
+
+            <div class="form-group">
+              <label>سعر الصرف</label>
+              <input type="number" id="exchangeRate" class="input" placeholder="مثال: 15000" step="0.01">
+            </div>
+
+            <div class="form-group">
+              <label>التاريخ</label>
+              <input type="date" id="date" class="input">
+            </div>
+
+            <div class="form-group">
+              <label>المكافئ بالدولار</label>
+              <input type="text" id="usdValue" class="input" placeholder="يظهر تلقائياً" readonly>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>ملاحظة</label>
+            <textarea id="note" class="textarea" placeholder="اكتب ملاحظة إن وجدت"></textarea>
+          </div>
+
+          <div class="stats">
+            <div class="stat">
+              <div class="label">المندوب المختار</div>
+              <div class="value" id="repPreview">-</div>
+            </div>
+            <div class="stat">
+              <div class="label">المنطقة المختارة</div>
+              <div class="value" id="regionPreview">-</div>
+            </div>
+            <div class="stat">
+              <div class="label">المكافئ بالدولار</div>
+              <div class="value" id="usdPreview">0</div>
+            </div>
+          </div>
+
+          <div class="actions">
+            <button class="btn btn-primary" id="saveIncomeBtn">✅ إضافة العملية</button>
+            <button class="btn btn-secondary" id="resetBtn">↺ مسح الحقول</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    const REPS = [
+      "civan ahmad",
+      "Ali Hashim",
+      "Kawa Hasan-OC",
+      "Direct Sales Qamishli/1",
+      "Direct Sales Qamishli /2",
+      "Dilxwaz Esso-OC",
+      "DSA-1",
+      "Direct Sales Amude / Jiyan",
+      "Bashar Suleiman",
+      "Direct Sales Mabade /barin hussein",
+      "Direct Sales Derik / Lelav",
+      "Sharif Ibrahim",
+      "Youssef Al-Saleh",
+      "DSH- 1",
+      "Direct Sales Alhasaka / Ali",
+      "Kamal Al-Hamada-OC",
+      "Direct Sales Alshadade",
+      "Jasem Hasso",
+      "Ahmad Omare",
+      "Frhad Ahmed-OC",
+      "Direct Sales- Ragga / Royar",
+      "Direct Sales- Raqqa 2 / ALDAR",
+      "Ahmed Al-Hunaidi-OC",
+      "Direct Sales- Tabqa / Abdullah",
+      "Adel Hussein",
+      "Direct Sales-kubani / Shavin",
+      "Shahir Al-Hamad",
+      "Mohamed Hassan",
+      "AGENT MANBIJ 3",
+      "Abd Al-Jassim"
+    ];
+
+    const REGIONS = [
+      "القامشلي",
+      "الحسكة",
+      "الرقة",
+      "الطبقة",
+      "كوباني",
+      "منبج"
+    ];
+
+    function $(id){ return document.getElementById(id); }
+
+    function toast(text, type='ok'){
+      const box = $('msgBox');
+      const div = document.createElement('div');
+      div.className = 'msg ' + (type === 'err' ? 'err' : 'ok');
+      div.textContent = text;
+      box.appendChild(div);
+      setTimeout(() => div.remove(), 2600);
+    }
+
+    function todayStr(){
+      const d = new Date();
+      return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+    }
+
+    function formatNumber(v){
+      return Number(v || 0).toLocaleString('en-US', {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 2
+      });
+    }
+
+    function fillSelect(selectId, items, placeholder){
+      const select = $(selectId);
+      select.innerHTML = `<option value="">${placeholder}</option>` + items.map(item => {
+        return `<option value="${item.replace(/"/g,'&quot;')}">${item}</option>`;
+      }).join('');
+    }
+
+    function updateComputedFields(){
+      const rep = $('rep').value || '-';
+      const region = $('region').value || '-';
+      const amount = parseFloat($('amount').value) || 0;
+      const rate = parseFloat($('exchangeRate').value) || 0;
+      const usd = rate > 0 ? (amount / rate) : 0;
+
+      $('repPreview').textContent = rep;
+      $('regionPreview').textContent = region;
+      $('usdPreview').textContent = formatNumber(usd);
+      $('usdValue').value = usd ? formatNumber(usd) : '';
+    }
+
+    function loadConfig(){
+      $('apiKey').value = localStorage.getItem('income_apiKey') || '';
+      $('authDomain').value = localStorage.getItem('income_authDomain') || '';
+      $('projectId').value = localStorage.getItem('income_projectId') || '';
+      $('collectionName').value = localStorage.getItem('income_collectionName') || 'reports';
+    }
+
+    function saveConfig(){
+      const apiKey = $('apiKey').value.trim();
+      const authDomain = $('authDomain').value.trim();
+      const projectId = $('projectId').value.trim();
+      const collectionName = $('collectionName').value.trim() || 'reports';
+
+      if(!apiKey || !authDomain || !projectId){
+        toast('⚠️ عبّي إعدادات Firebase كاملة', 'err');
+        return false;
+      }
+
+      localStorage.setItem('income_apiKey', apiKey);
+      localStorage.setItem('income_authDomain', authDomain);
+      localStorage.setItem('income_projectId', projectId);
+      localStorage.setItem('income_collectionName', collectionName);
+
+      toast('✅ تم حفظ إعدادات Firebase');
+      return true;
+    }
+
+    function clearConfig(){
+      localStorage.removeItem('income_apiKey');
+      localStorage.removeItem('income_authDomain');
+      localStorage.removeItem('income_projectId');
+      localStorage.removeItem('income_collectionName');
+      loadConfig();
+      toast('🗑️ تم حذف الإعدادات');
+    }
+
+    function buildFirebase(){
+      const apiKey = localStorage.getItem('income_apiKey');
+      const authDomain = localStorage.getItem('income_authDomain');
+      const projectId = localStorage.getItem('income_projectId');
+
+      if(!apiKey || !authDomain || !projectId){
+        throw new Error('Firebase config missing');
+      }
+
+      const config = { apiKey, authDomain, projectId };
+      const app = getApps().length ? getApp() : initializeApp(config);
+      return getFirestore(app);
+    }
+
+    async function saveIncome(){
+      const rep = $('rep').value.trim();
+      const region = $('region').value.trim();
+      const amount = parseFloat($('amount').value);
+      const exchangeRate = parseFloat($('exchangeRate').value);
+      const date = $('date').value;
+      const note = $('note').value.trim();
+      const amountUSD = exchangeRate > 0 ? amount / exchangeRate : 0;
+
+      if(!rep){
+        toast('⚠️ اختر المندوب', 'err');
+        return;
+      }
+      if(!region){
+        toast('⚠️ اختر المنطقة', 'err');
+        return;
+      }
+      if(!amount || amount <= 0){
+        toast('⚠️ أدخل مبلغ صحيح', 'err');
+        return;
+      }
+      if(!exchangeRate || exchangeRate <= 0){
+        toast('⚠️ أدخل سعر صرف صحيح', 'err');
+        return;
+      }
+      if(!date){
+        toast('⚠️ اختر التاريخ', 'err');
+        return;
+      }
+
+      try{
+        const db = buildFirebase();
+        const collectionName = localStorage.getItem('income_collectionName') || 'reports';
+
+        await addDoc(collection(db, collectionName), {
+          rep,
+          region,
+          city: region,
+          amount,
+          amountSYP: amount,
+          exchangeRate,
+          rate: exchangeRate,
+          amountUSD,
+          date,
+          note,
+          createdAt: new Date().toISOString()
+        });
+
+        toast('✅ تمت إضافة العملية بنجاح');
+        resetForm(false);
+      } catch(err){
+        console.error(err);
+        toast('❌ فشل حفظ العملية. تأكد من إعدادات Firebase', 'err');
+      }
+    }
+
+    function resetForm(resetDate=true){
+      $('rep').value = '';
+      $('region').value = '';
+      $('amount').value = '';
+      $('exchangeRate').value = '';
+      $('usdValue').value = '';
+      $('note').value = '';
+      if(resetDate) $('date').value = todayStr();
+      updateComputedFields();
+    }
+
+    fillSelect('rep', REPS, 'اختر المندوب');
+    fillSelect('region', REGIONS, 'اختر المنطقة');
+    loadConfig();
+    $('date').value = todayStr();
+    updateComputedFields();
+
+    $('rep').addEventListener('change', updateComputedFields);
+    $('region').addEventListener('change', updateComputedFields);
+    $('amount').addEventListener('input', updateComputedFields);
+    $('exchangeRate').addEventListener('input', updateComputedFields);
+
+    $('saveConfigBtn').addEventListener('click', saveConfig);
+    $('clearConfigBtn').addEventListener('click', clearConfig);
+    $('saveIncomeBtn').addEventListener('click', async () => {
+      if(!saveConfig()) return;
+      await saveIncome();
+    });
+    $('resetBtn').addEventListener('click', () => resetForm(true));
+  </script>
+</body>
+</html>
